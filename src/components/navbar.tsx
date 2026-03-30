@@ -47,7 +47,7 @@ export default function Navbar() {
 		},
 		{
 			label: "Events",
-			link: "https://theexhibit.co",
+			link: "https://theexhibit.co/events",
 		},
 		{
 			label: "Contact",

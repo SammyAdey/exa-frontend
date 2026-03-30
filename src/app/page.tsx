@@ -30,9 +30,11 @@ export default function Home() {
 								smarter, and track every guest touchpoint.
 							</p>
 							<div className='flex flex-wrap gap-4 mt-[20px]'>
-								<button className='rounded-[4px] flex items-center justify-center bg-white px-7 py-3 text-sm font-semibold uppercase text-black hover:text-white duration-300 hover:bg-primary cursor-pointer'>
-									<Calendar className='mr-2' size={20} /> Book a demo
-								</button>
+								<Link href='https://cal.com/arcxne/1-hour-meeting'>
+									<button className='rounded-[4px] flex items-center justify-center bg-white px-7 py-3 text-sm font-semibold uppercase text-black hover:text-white duration-300 hover:bg-primary cursor-pointer'>
+										<Calendar className='mr-2' size={20} /> Book a demo
+									</button>
+								</Link>
 							</div>
 						</div>
 					</section>
@@ -41,32 +43,32 @@ export default function Home() {
 						<div className='grid gap-7 md:grid-cols-3 px-12'>
 							{[
 								{
-									icon: <LogIn className='text-black' size={24} />,
+									icon: <LogIn className='text-primary' size={24} />,
 									title: "Instant check-in",
 									desc: "QR scanning, smart waitlists, and priority flows keep the line moving.",
 								},
 								{
-									icon: <Ticket className='text-black' size={24} />,
+									icon: <Ticket className='text-primary' size={24} />,
 									title: "Ticketing",
 									desc: "Capture preferences, spend history, and VIP notes with every visit.",
 								},
 								{
-									icon: <DollarSign className='text-black' size={24} />,
+									icon: <DollarSign className='text-primary' size={24} />,
 									title: "Revenue control",
 									desc: "Track bottle service, promoter splits, and nightly reports in one view.",
 								},
 								{
-									icon: <Calendar className='text-black' size={24} />,
+									icon: <Calendar className='text-primary' size={24} />,
 									title: "RSVPs",
 									desc: "Track bottle service, promoter splits, and nightly reports in one view.",
 								},
 								{
-									icon: <User className='text-black' size={24} />,
+									icon: <User className='text-primary' size={24} />,
 									title: "Guest List Management",
 									desc: "Capture preferences, spend history, and VIP notes with every visit.",
 								},
 								{
-									icon: <Table2 className='text-black' size={24} />,
+									icon: <Table2 className='text-primary' size={24} />,
 									title: "Table bookings",
 									desc: "Track bottle service, promoter splits, and nightly reports in one view.",
 								},
