@@ -74,6 +74,8 @@ export default function Navbar() {
 				<div className='flex gap-3'>
 					<Link
 						href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/login`}
+						target='_blank'
+						rel='noopener noreferrer'
 						className='flex justify-center w-[100px] cursor-pointer rounded-sm border px-5 py-2 text-white/80 transition hover:border-white hover:text-white'
 					>
 						Login
@@ -81,6 +83,8 @@ export default function Navbar() {
 
 					<Link
 						href={`${process.env.NEXT_PUBLIC_DASHBOARD_URL}/signup`}
+						target='_blank'
+						rel='noopener noreferrer'
 						className='w-[100px] rounded-sm bg-white px-5 py-2 text-center capitalize text-black transition hover:bg-primary hover:text-white'
 					>
 						Sign Up
