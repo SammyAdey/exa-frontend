@@ -58,8 +58,9 @@ export default function Navbar() {
 	return (
 		<header className='relative z-10 mx-auto flex w-full items-center justify-between px-10 py-6'>
 			<div className='flex items-center gap-14'>
-				<Image className='w-[80px]' width={80} height={80} alt='Logo' src='/Logo.svg' />
-
+				<Link href='/'>
+					<Image className='w-[80px]' width={80} height={80} alt='Logo' src='/Logo.svg' />
+				</Link>
 				<nav>
 					<div className='flex gap-8'>
 						{menu.map((item) => (
