@@ -261,7 +261,7 @@ export default function RSVPPage() {
 										onClick={() => handleSubmit("confirmed")}
 										className='flex-1 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
 									>
-										{submitingLabel(submitting, "Confirm RSVP")}
+										{submitingLabel(submitting, "I'm Attending")}
 									</button>
 									<button
 										type='button'
@@ -269,7 +269,7 @@ export default function RSVPPage() {
 										onClick={() => handleSubmit("declined")}
 										className='flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white/80 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
 									>
-										{submitingLabel(submitting, "Decline")}
+										{submitingLabel(submitting, "I can't attend")}
 									</button>
 								</div>
 							</form>
