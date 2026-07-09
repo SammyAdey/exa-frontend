@@ -3,9 +3,8 @@
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import Navbar from "../../../components/navbar";
-import Footer from "../../../components/footer";
-import { Calendar, Drama, Map } from "lucide-react";
+import RsvpEventDetails from "../../../components/rsvp-event-details";
+import { DEFAULT_EVENT_PAGE_THEME, extractImageAccentColor, type EventPageTheme } from "../../../utils/image-accent-color";
 
 type EventPayload = {
 	eventName?: string;
@@ -32,6 +31,7 @@ export default function RSVPPage() {
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
+	const [pageTheme, setPageTheme] = useState<EventPageTheme>(DEFAULT_EVENT_PAGE_THEME);
 
 	const eventTitle = event?.eventName || "RSVP";
 	const formattedDate = useMemo(() => {
@@ -79,6 +79,24 @@ export default function RSVPPage() {
 			isMounted = false;
 		};
 	}, [eventId]);
+
+	useEffect(() => {
+		if (!event?.eventImage) {
+			setPageTheme(DEFAULT_EVENT_PAGE_THEME);
+			return;
+		}
+
+		let isMounted = true;
+		extractImageAccentColor(event.eventImage).then((theme) => {
+			if (isMounted && theme) {
+				setPageTheme(theme);
+			}
+		});
+
+		return () => {
+			isMounted = false;
+		};
+	}, [event?.eventImage]);
 
 	const handleSubmit = async (status: RSVPStatus) => {
 		if (!email || !firstName || !lastName || !phoneNumber) {
@@ -133,10 +151,20 @@ export default function RSVPPage() {
 	};
 
 	return (
-		<div className='min-h-screen bg-[#0B0B0C] text-white'>
-			<div className='min-h-screen relative overflow-hidden'>
-				<div className='absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(158,0,255,0.18),_transparent_55%)]' />
-				<div className='absolute inset-0 bg-[radial-gradient(circle_at_bottom,_rgba(0,255,204,0.12),_transparent_50%)]' />
+		<div className='min-h-screen text-white transition-[background-color] duration-700' style={{ backgroundColor: pageTheme.background }}>
+			<div className='relative min-h-screen overflow-hidden'>
+				{event?.eventImage ? (
+					<div className='pointer-events-none absolute inset-0' aria-hidden='true'>
+						<img src={event.eventImage} alt='' className='absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-3xl' />
+						<div className='absolute inset-0 bg-black/45' />
+					</div>
+				) : null}
+				<div
+					className='pointer-events-none absolute inset-0'
+					style={{
+						background: `radial-gradient(circle at top, rgba(${pageTheme.accentRgb}, 0.28), transparent 58%), radial-gradient(circle at bottom, rgba(${pageTheme.accentRgb}, 0.16), transparent 52%)`,
+					}}
+				/>
 
 				<main className='relative z-10 mx-auto w-full max-w-3xl gap-10 px-6 pb-20 pt-8 lg:flex-row lg:items-start lg:gap-16'>
 					<div className='flex-1 space-y-6'>
@@ -151,43 +179,13 @@ export default function RSVPPage() {
 						</div>
 					</div>
 
-					<div className='my-20 grid grid-cols-3 gap-4'>
-						<div className='flex gap-2'>
-							<div>
-								<div className='p-3 bg-white inline-flex w-wrap h-wrap items-center justify-center rounded-md'>
-									<Calendar className='text-black' />
-								</div>
-							</div>
-							<div className='flex flex-col'>
-								<h4 className='text-xs uppercase font-semibold text-gray-400'>Date & Time</h4>
-								<p className='mt-1 text-white/90 text-lg'>
-									{formattedDate || "Date to be announced"} · {event?.eventTime || "Time to be announced"}
-								</p>
-							</div>
-						</div>
-						<div className='flex gap-2'>
-							<div>
-								<div className='p-3 bg-white inline-flex items-center justify-center rounded-md'>
-									<Map className='text-black' />
-								</div>
-							</div>
-							<div className='flex flex-col'>
-								<h4 className='text-xs uppercase font-semibold text-gray-400'>Location</h4>
-								<p className='mt-1 text-white/90 text-lg'>{event?.eventAddress || "Location details will be shared soon."}</p>
-							</div>
-						</div>
-						<div className='flex gap-2'>
-							<div>
-								<div className='p-3 bg-white inline-flex w-wrap h-wrap items-center justify-center rounded-md'>
-									<Drama className='text-black' />
-								</div>
-							</div>
-							<div className='flex flex-col'>
-								<h4 className='text-xs uppercase font-semibold text-gray-400'>Dress Code</h4>
-								<p className='mt-1 text-white/90 text-lg'>{event?.dressCode || "-"}</p>
-							</div>
-						</div>
-					</div>
+					<RsvpEventDetails
+						formattedDate={formattedDate}
+						eventTime={event?.eventTime}
+						eventAddress={event?.eventAddress}
+						dressCode={event?.dressCode}
+						accentRgb={pageTheme.accentRgb}
+					/>
 
 					<div className='flex-1'>
 						<div className=''>
@@ -276,7 +274,6 @@ export default function RSVPPage() {
 						</div>
 					</div>
 				</main>
-				<Footer />
 			</div>
 		</div>
 	);

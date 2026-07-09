@@ -56,7 +56,7 @@ export default function Navbar() {
 	];
 
 	return (
-		<header className='relative z-10 mx-auto flex w-full items-center justify-between px-10 py-6'>
+		<header className='relative text-[14px] z-10 mx-auto flex w-full items-center justify-between px-10 py-6'>
 			<div className='flex items-center gap-14'>
 				<Link href='/'>
 					<Image className='w-[80px]' width={80} height={80} alt='Logo' src='/Logo.svg' />
