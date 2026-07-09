@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import RsvpEventDetails from "../../../components/rsvp-event-details";
 import { DEFAULT_EVENT_PAGE_THEME, extractImageAccentColor, type EventPageTheme } from "../../../utils/image-accent-color";
+import { normalizeRouteParam, withQuery } from "../../../utils/url";
 
 type EventPayload = {
 	eventName?: string;
@@ -20,7 +21,8 @@ type EventPayload = {
 type RSVPStatus = "confirmed" | "declined";
 
 export default function RSVPPage() {
-	const { eventId } = useParams();
+	const { eventId: eventIdParam } = useParams();
+	const eventId = normalizeRouteParam(eventIdParam);
 	const [event, setEvent] = useState<EventPayload | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export default function RSVPPage() {
 			try {
 				setLoading(true);
 				setError(null);
-				const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/events/event?id=${eventId}`, {
+				const response = await fetch(withQuery(process.env.NEXT_PUBLIC_API_BASE_URL ?? "", "/events/event", { id: eventId }), {
 					cache: "no-store",
 				});
 				const payload: { data?: EventPayload; message?: string } = await response.json().catch(() => ({}));

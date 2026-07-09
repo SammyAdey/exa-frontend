@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { encodePathSegment, normalizeRouteParam, withQuery } from "../../../utils/url";
 import { resolveWhatsAppMediaUrl } from "../../../utils/whatsapp-media";
 
 type EventPayload = {
@@ -15,12 +16,13 @@ const getSiteUrl = () =>
 
 async function fetchEvent(eventId: string): Promise<EventPayload | null> {
 	const apiBase = String(process.env.NEXT_PUBLIC_API_BASE_URL ?? "").trim().replace(/\/+$/, "");
-	if (!apiBase) {
+	const normalizedId = normalizeRouteParam(eventId);
+	if (!apiBase || !normalizedId) {
 		return null;
 	}
 
 	try {
-		const response = await fetch(`${apiBase}/events/event?id=${encodeURIComponent(eventId)}`, {
+		const response = await fetch(withQuery(apiBase, "/events/event", { id: normalizedId }), {
 			next: { revalidate: 300 },
 		});
 		if (!response.ok) {
@@ -38,12 +40,13 @@ export async function generateMetadata({
 }: {
 	params: Promise<{ eventId: string }>;
 }): Promise<Metadata> {
-	const { eventId } = await params;
+	const { eventId: eventIdParam } = await params;
+	const eventId = normalizeRouteParam(eventIdParam);
 	const event = await fetchEvent(eventId);
 	const eventName = String(event?.eventName ?? "").trim() || "Event RSVP";
 	const description = String(event?.eventDescription ?? `You're invited to ${eventName}. RSVP online.`).trim();
 	const imageUrl = resolveWhatsAppMediaUrl(event?.eventImage);
-	const pageUrl = `${getSiteUrl()}/rsvp/${eventId}`;
+	const pageUrl = `${getSiteUrl()}/rsvp/${encodePathSegment(eventId)}`;
 
 	return {
 		title: `${eventName} | RSVP`,
