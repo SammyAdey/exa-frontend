@@ -20,6 +20,16 @@ type EventPayload = {
 
 type RSVPStatus = "confirmed" | "declined";
 
+const COUNTRY_CODES = [
+	{ label: "Nigeria (+234)", value: "+234" },
+	{ label: "Australia (+61)", value: "+61" },
+	{ label: "United States (+1)", value: "+1" },
+	{ label: "United Kingdom (+44)", value: "+44" },
+	{ label: "Ghana (+233)", value: "+233" },
+	{ label: "Kenya (+254)", value: "+254" },
+	{ label: "South Africa (+27)", value: "+27" },
+] as const;
+
 export default function RSVPPage() {
 	const { eventId: eventIdParam } = useParams();
 	const eventId = normalizeRouteParam(eventIdParam);
@@ -235,12 +245,11 @@ export default function RSVPPage() {
 											onChange={(event) => setCountryCode(event.target.value)}
 											className='w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-primary/60 focus:outline-none'
 										>
-											<option value='+234'>Nigeria (+234)</option>
-											<option value='+1'>United States (+1)</option>
-											<option value='+44'>United Kingdom (+44)</option>
-											<option value='+233'>Ghana (+233)</option>
-											<option value='+254'>Kenya (+254)</option>
-											<option value='+27'>South Africa (+27)</option>
+											{COUNTRY_CODES.map((code) => (
+												<option key={code.value + code.label} value={code.value}>
+													{code.label}
+												</option>
+											))}
 										</select>
 									</label>
 									<label className='flex flex-col gap-2 text-sm text-white/60 md:col-span-2'>
