@@ -13,7 +13,7 @@ export default function Home() {
 					{/* Background glow — z-0 sits above section bg, content sits at z-10 */}
 					<div className='min-h-[80vh] pointer-events-none absolute inset-0 top-1/3 z-0'>
 						<div className='absolute left-0 top-1/2 h-[15vh] z-1 w-screen rounded-full bg-[#F3EFE3] blur-[120px]' />
-						<div className='absolute inset-0 bg-gradient-to-b from-[#0b0b0c] via-[#9E00FF] to-[#0b0b0c]' />
+						<div className='absolute inset-0 bg-linear-to-b from-[#0b0b0c] via-primary to-[#0b0b0c]' />
 					</div>
 
 					<div className='relative z-10 h-[7vh] w-full' />
@@ -29,7 +29,7 @@ export default function Home() {
 							EXA brings guest lists, table bookings, ticketing, and real-time insights into one sleek workspace. Launch events faster, fill venues
 							smarter, and track every guest touchpoint.
 						</p>
-						<div className='hidden flex flex-wrap gap-4 mt-[20px]'>
+						<div className='hidden flex-wrap gap-4 mt-[20px]'>
 							<Link href='https://cal.com/arcxne/1-hour-meeting'>
 								<button className='rounded-[4px] flex items-center justify-center bg-white px-7 py-3 text-sm font-semibold uppercase text-black hover:text-white duration-300 hover:bg-primary cursor-pointer'>
 									<Calendar className='mr-2' size={20} /> Book a demo
@@ -86,7 +86,7 @@ export default function Home() {
 								desc: "Track bottle service, promoter splits, and nightly reports in one view.",
 							},
 						].map((item) => (
-							<div key={item.title} className='rounded-2xl border border-white/[0.08] bg-[#111113] p-8 sm:p-10'>
+							<div key={item.title} className='rounded-2xl border border-white/8 bg-[#111113] p-8 sm:p-10'>
 								<div className='inline-flex text-[#C3A8FF]'>{item.icon}</div>
 								<p className='text-xl font-semibold mt-14'>{item.title}</p>
 								<p className='mt-6 text leading-6 text-white/60'>{item.desc}</p>
@@ -118,14 +118,14 @@ export default function Home() {
 					</div>
 					<h1 className='text-5xl font-medium md:text-6xl tracking-tighter mt-[-30px]'>Pricing for controlled access events</h1>
 					<div className='w-full grid gap-8 lg:grid-cols-2'>
-						<div className='rounded-3xl border border-white/10 bg-gradient-to-b from-[#C3A8FF] to-white p-12'>
+						<div className='rounded-3xl border border-white/10 bg-linear-to-b from-[#C3A8FF] to-white p-12'>
 							<div className=' font-mono font-medium px-8 py-1 bg-[#FFF546] rounded-full border-2 border-black text-black inline-flex items-center gap-2'>
 								Best Seller
 							</div>
 
 							<p className='text-[90px] tracking-tighter font-medium text-black'>XP</p>
 							<p className='font-medium font-mono text-black'>Secure invitations & guest verification</p>
-							<div className='h-[1px] w-full bg-black my-6' />
+							<div className='h-px w-full bg-black my-6' />
 							<div className='text-black text-sm font-semibold flex flex-col gap-6'>
 								<div className='flex items-center justify-between'>
 									<div className='flex items-center gap-2'>
@@ -164,7 +164,7 @@ export default function Home() {
 
 							<p className='text-[90px] tracking-tighter font-medium text-white'>XP+</p>
 							<p className='font-medium font-mono text-white'>Everything in XP, plus post-event engagement</p>
-							<div className='h-[1px] w-full bg-white my-6' />
+							<div className='h-px w-full bg-white my-6' />
 							<div className='text-white text-sm font-semibold flex flex-col gap-6'>
 								<div className='flex items-center justify-between'>
 									<div className='flex items-center gap-2'>

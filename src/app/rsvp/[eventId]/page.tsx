@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import RsvpEventDetails from "../../../components/rsvp-event-details";
 import { DEFAULT_EVENT_PAGE_THEME, extractImageAccentColor, type EventPageTheme } from "../../../utils/image-accent-color";
 import { normalizeRouteParam, withQuery } from "../../../utils/url";
@@ -43,12 +44,22 @@ export default function RSVPPage() {
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
-	const [pageTheme, setPageTheme] = useState<EventPageTheme>(DEFAULT_EVENT_PAGE_THEME);
+	const [extractedTheme, setExtractedTheme] = useState<{ image: string; theme: EventPageTheme } | null>(null);
+
+	useEffect(() => {
+		if (!error && !successMessage) {
+			return;
+		}
+		const alertNode = document.getElementById("rsvp-alert");
+		alertNode?.scrollIntoView({ behavior: "smooth", block: "center" });
+	}, [error, successMessage]);
 
 	const eventTitle = event?.eventName || "RSVP";
+	const eventImage = event?.eventImage;
+	const eventStartDate = event?.eventStartDate;
 	const formattedDate = useMemo(() => {
-		if (!event?.eventStartDate) return "";
-		const date = new Date(event.eventStartDate);
+		if (!eventStartDate) return "";
+		const date = new Date(eventStartDate);
 		return Number.isNaN(date.getTime())
 			? ""
 			: date.toLocaleDateString("en-US", {
@@ -57,7 +68,9 @@ export default function RSVPPage() {
 					month: "long",
 					day: "numeric",
 				});
-	}, [event?.eventStartDate]);
+	}, [eventStartDate]);
+	const pageTheme =
+		eventImage && extractedTheme?.image === eventImage ? extractedTheme.theme : DEFAULT_EVENT_PAGE_THEME;
 
 	useEffect(() => {
 		let isMounted = true;
@@ -93,22 +106,21 @@ export default function RSVPPage() {
 	}, [eventId]);
 
 	useEffect(() => {
-		if (!event?.eventImage) {
-			setPageTheme(DEFAULT_EVENT_PAGE_THEME);
+		if (!eventImage) {
 			return;
 		}
 
 		let isMounted = true;
-		extractImageAccentColor(event.eventImage).then((theme) => {
+		extractImageAccentColor(eventImage).then((theme) => {
 			if (isMounted && theme) {
-				setPageTheme(theme);
+				setExtractedTheme({ image: eventImage, theme });
 			}
 		});
 
 		return () => {
 			isMounted = false;
 		};
-	}, [event?.eventImage]);
+	}, [eventImage]);
 
 	const handleSubmit = async (status: RSVPStatus) => {
 		if (!email || !firstName || !lastName || !phoneNumber) {
@@ -140,7 +152,7 @@ export default function RSVPPage() {
 						description: event.description || "-",
 					},
 					email,
-					phoneNumber: `${countryCode}${phoneNumber}`,
+					phoneNumber: `${countryCode}${phoneNumber.replace(/\D/g, "").replace(/^0+/, "")}`,
 					phoneCountryCode: countryCode,
 					firstname: firstName,
 					lastname: lastName,
@@ -167,7 +179,7 @@ export default function RSVPPage() {
 			<div className='relative min-h-screen overflow-hidden'>
 				{event?.eventImage ? (
 					<div className='pointer-events-none absolute inset-0' aria-hidden='true'>
-						<img src={event.eventImage} alt='' className='absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-3xl' />
+						<Image src={event.eventImage} alt='' fill sizes='100vw' className='scale-110 object-cover opacity-35 blur-3xl' />
 						<div className='absolute inset-0 bg-black/45' />
 					</div>
 				) : null}
@@ -205,8 +217,32 @@ export default function RSVPPage() {
 							<p className='mt-2 text-sm text-white/60'>Confirm or decline your attendance.</p>
 
 							{loading && <p className='mt-6 text-white/60'>Loading event details...</p>}
-							{error && <p className='mt-6 text-sm text-red-300'>{error}</p>}
-							{successMessage && <p className='mt-6 text-sm text-emerald-300'>{successMessage}</p>}
+							{error && (
+								<div
+									id='rsvp-alert'
+									role='alert'
+									className='mt-6 flex items-start gap-3 rounded-2xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-red-100 shadow-[0_0_0_1px_rgba(248,113,113,0.12)]'
+								>
+									<AlertCircle className='mt-0.5 h-5 w-5 shrink-0 text-red-300' aria-hidden='true' />
+									<div>
+										<p className='text-sm font-semibold text-red-100'>Unable to submit RSVP</p>
+										<p className='mt-1 text-sm leading-relaxed text-red-100/90'>{error}</p>
+									</div>
+								</div>
+							)}
+							{successMessage && (
+								<div
+									id='rsvp-alert'
+									role='status'
+									className='mt-6 flex items-start gap-3 rounded-2xl border border-emerald-400/40 bg-emerald-500/15 px-4 py-3 text-emerald-50 shadow-[0_0_0_1px_rgba(52,211,153,0.12)]'
+								>
+									<CheckCircle2 className='mt-0.5 h-5 w-5 shrink-0 text-emerald-300' aria-hidden='true' />
+									<div>
+										<p className='text-sm font-semibold text-emerald-100'>RSVP received</p>
+										<p className='mt-1 text-sm leading-relaxed text-emerald-50/90'>{successMessage}</p>
+									</div>
+								</div>
+							)}
 
 							<form
 								className='mt-6 space-y-4'
@@ -268,7 +304,7 @@ export default function RSVPPage() {
 										type='button'
 										disabled={submitting}
 										onClick={() => handleSubmit("confirmed")}
-										className='flex-1 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
+										className='flex-1 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:cursor-pointer hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
 									>
 										{submitingLabel(submitting, "I'm Attending")}
 									</button>
@@ -276,7 +312,7 @@ export default function RSVPPage() {
 										type='button'
 										disabled={submitting}
 										onClick={() => handleSubmit("declined")}
-										className='flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white/80 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
+										className='flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold hover:cursor-pointer text-white/80 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
 									>
 										{submitingLabel(submitting, "I can't attend")}
 									</button>
