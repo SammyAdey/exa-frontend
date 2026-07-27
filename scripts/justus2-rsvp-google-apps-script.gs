@@ -1,0 +1,48 @@
+/**
+ * Google Apps Script for JUSTUS2 wedding RSVP → Google Sheet
+ *
+ * Setup (easiest auth — no service account):
+ * 1. Create a Google Sheet.
+ * 2. Row 1 headers:
+ *    Timestamp | First Name | Last Name | Email | Country Code | Phone | Attending | Accommodation | Event | Source
+ * 3. Extensions → Apps Script → paste this file's code into Code.gs
+ * 4. Deploy → New deployment → Type: Web app
+ *    - Execute as: Me
+ *    - Who has access: Anyone
+ * 5. Copy the Web App URL into frontend env:
+ *    WEDDING_JUSTUS2_SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/.../exec
+ */
+
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents || "{}");
+
+    sheet.appendRow([
+      data.timestamp || new Date().toISOString(),
+      data.firstName || "",
+      data.lastName || "",
+      data.email || "",
+      data.phoneCountryCode || "",
+      data.phoneNumber || "",
+      data.attendance || "",
+      data.accommodation || "",
+      data.event || "Oluwaseun & Oluwatimilehin",
+      data.source || "",
+    ]);
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet() {
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true, message: "JUSTUS2 RSVP webhook is live." }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
