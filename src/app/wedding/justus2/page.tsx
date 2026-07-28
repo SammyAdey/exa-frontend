@@ -21,7 +21,7 @@ const INVITE_FROM_OPTIONS = [
 	"Posi Ademulegun",
 ] as const;
 
-const INVITE_IMAGE = "/wedding/justus2-invite.png";
+const INVITE_IMAGE = "/wedding/justus2-invite2.png";
 
 const styles = {
 	pageText: { color: "#1c1714" },
