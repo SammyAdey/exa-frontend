@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
 		accommodation: accommodation === "yes" ? "Yes" : "No",
 		inviteFrom,
 		event: "Oluwaseun & Oluwatimilehin",
-		source: "wedding/oluwaseun-oluwatimilehin",
+		source: "wedding/justus2",
 	};
 
 	try {

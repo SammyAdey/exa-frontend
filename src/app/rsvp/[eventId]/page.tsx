@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import RsvpEventDetails from "../../../components/rsvp-event-details";
 import { DEFAULT_EVENT_PAGE_THEME, extractImageAccentColor, type EventPageTheme } from "../../../utils/image-accent-color";
+import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../utils/country-codes";
 import { normalizeRouteParam, withQuery } from "../../../utils/url";
 
 type EventPayload = {
@@ -21,16 +22,6 @@ type EventPayload = {
 
 type RSVPStatus = "confirmed" | "declined";
 
-const COUNTRY_CODES = [
-	{ label: "Nigeria (+234)", value: "+234" },
-	{ label: "Australia (+61)", value: "+61" },
-	{ label: "United States (+1)", value: "+1" },
-	{ label: "United Kingdom (+44)", value: "+44" },
-	{ label: "Ghana (+233)", value: "+233" },
-	{ label: "Kenya (+254)", value: "+254" },
-	{ label: "South Africa (+27)", value: "+27" },
-] as const;
-
 export default function RSVPPage() {
 	const { eventId: eventIdParam } = useParams();
 	const eventId = normalizeRouteParam(eventIdParam);
@@ -40,7 +31,7 @@ export default function RSVPPage() {
 	const [firstName, setFirstName] = useState("");
 	const [lastName, setLastName] = useState("");
 	const [email, setEmail] = useState("");
-	const [countryCode, setCountryCode] = useState("+234");
+	const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE);
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -282,7 +273,7 @@ export default function RSVPPage() {
 											className='w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white focus:border-primary/60 focus:outline-none'
 										>
 											{COUNTRY_CODES.map((code) => (
-												<option key={code.value + code.label} value={code.value}>
+												<option key={code.name} value={code.value}>
 													{code.label}
 												</option>
 											))}
