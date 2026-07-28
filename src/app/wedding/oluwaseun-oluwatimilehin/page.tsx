@@ -17,6 +17,19 @@ const COUNTRY_CODES = [
 	{ label: "South Africa (+27)", value: "+27" },
 ] as const;
 
+const INVITE_FROM_OPTIONS = [
+	"Seun Ademulegun",
+	"Timi Ademulegun",
+	"Olumide Oloruntoba",
+	"Nike Konneh",
+	"Damilola Ayeni",
+	"Niniola Oloruntoba",
+	"Seun Oloruntoba",
+	"Dami Ademulegun",
+	"Toni Ademulegun",
+	"Posi Ademulegun",
+] as const;
+
 const INVITE_IMAGE = "/wedding/justus2-invite.png";
 
 const styles = {
@@ -47,6 +60,7 @@ export default function JustUs2WeddingRsvpPage() {
 	const [countryCode, setCountryCode] = useState("+234");
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [accommodation, setAccommodation] = useState<YesNo | "">("");
+	const [inviteFrom, setInviteFrom] = useState("");
 	const [submitting, setSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -63,6 +77,10 @@ export default function JustUs2WeddingRsvpPage() {
 		}
 		if (!accommodation) {
 			setError("Please tell us if you require accommodation in Lagos.");
+			return;
+		}
+		if (!inviteFrom) {
+			setError("Please select who you received the invite from.");
 			return;
 		}
 
@@ -82,6 +100,7 @@ export default function JustUs2WeddingRsvpPage() {
 					phoneNumber: `${countryCode}${phoneNumber.replace(/\D/g, "").replace(/^0+/, "")}`,
 					attendance,
 					accommodation,
+					inviteFrom,
 				}),
 			});
 			const payload: { message?: string } = await response.json().catch(() => ({}));
@@ -127,7 +146,7 @@ export default function JustUs2WeddingRsvpPage() {
 						className="text-[11px] uppercase tracking-[0.35em]"
 						style={{ ...styles.muted, fontFamily: "var(--font-wedding-body)" }}
 					>
-						{"#JUSTUS2"}
+						{"#juSTus2"}
 					</p>
 					<div
 						className="relative mx-auto mt-5 w-full max-w-md overflow-hidden rounded-sm"
@@ -280,6 +299,26 @@ export default function JustUs2WeddingRsvpPage() {
 								</label>
 							</div>
 
+							<label className="flex flex-col gap-2 text-sm" style={styles.soft}>
+								Who did you receive the invite from?
+								<select
+									value={inviteFrom}
+									onChange={(e) => setInviteFrom(e.target.value)}
+									className={inputClass}
+									style={styles.input}
+									required
+								>
+									<option value="" disabled>
+										Select a name
+									</option>
+									{INVITE_FROM_OPTIONS.map((name) => (
+										<option key={name} value={name}>
+											{name}
+										</option>
+									))}
+								</select>
+							</label>
+
 							<fieldset className="rounded-xl border bg-white px-4 py-4" style={{ borderColor: "#ddd0ca" }}>
 								<legend className="px-1 text-sm font-medium" style={styles.body}>
 									Do you require accommodation in Lagos?
@@ -333,7 +372,7 @@ export default function JustUs2WeddingRsvpPage() {
 				</section>
 
 				<p className="mt-10 text-center text-[11px] uppercase tracking-[0.3em]" style={{ color: "#9a8b86" }}>
-					{"#JUSTUS2"}
+					{"#juSTus2"}
 				</p>
 			</main>
 		</div>

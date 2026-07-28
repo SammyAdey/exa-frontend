@@ -4,13 +4,16 @@
  * Setup (easiest auth — no service account):
  * 1. Create a Google Sheet.
  * 2. Row 1 headers:
- *    Timestamp | First Name | Last Name | Email | Country Code | Phone | Attending | Accommodation | Event | Source
+ *    Timestamp | First Name | Last Name | Email | Country Code | Phone | Attending | Accommodation | Invite From | Event | Source
  * 3. Extensions → Apps Script → paste this file's code into Code.gs
  * 4. Deploy → New deployment → Type: Web app
  *    - Execute as: Me
  *    - Who has access: Anyone
  * 5. Copy the Web App URL into frontend env:
  *    WEDDING_JUSTUS2_SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/.../exec
+ *
+ * If the sheet already exists, add an "Invite From" column after Accommodation,
+ * update Code.gs with this script, then Deploy → Manage deployments → Edit → New version.
  */
 
 function doPost(e) {
@@ -27,6 +30,7 @@ function doPost(e) {
       data.phoneNumber || "",
       data.attendance || "",
       data.accommodation || "",
+      data.inviteFrom || "",
       data.event || "Oluwaseun & Oluwatimilehin",
       data.source || "",
     ]);

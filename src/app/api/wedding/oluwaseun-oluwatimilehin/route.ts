@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const INVITE_FROM_OPTIONS = [
+	"Seun Ademulegun",
+	"Timi Ademulegun",
+	"Olumide Oloruntoba",
+	"Nike Konneh",
+	"Damilola Ayeni",
+	"Niniola Oloruntoba",
+	"Seun Oloruntoba",
+	"Dami Ademulegun",
+	"Toni Ademulegun",
+	"Posi Ademulegun",
+] as const;
+
+type InviteFrom = (typeof INVITE_FROM_OPTIONS)[number];
+
 type WeddingRsvpBody = {
 	firstName?: string;
 	lastName?: string;
@@ -8,7 +23,12 @@ type WeddingRsvpBody = {
 	phoneNumber?: string;
 	attendance?: "confirmed" | "declined";
 	accommodation?: "yes" | "no";
+	inviteFrom?: string;
 };
+
+function isInviteFrom(value: unknown): value is InviteFrom {
+	return typeof value === "string" && (INVITE_FROM_OPTIONS as readonly string[]).includes(value);
+}
 
 function isNonEmptyString(value: unknown): value is string {
 	return typeof value === "string" && value.trim().length > 0;
@@ -33,7 +53,8 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json({ message: "Invalid request body." }, { status: 400 });
 	}
 
-	const { firstName, lastName, email, phoneCountryCode, phoneNumber, attendance, accommodation } = body;
+	const { firstName, lastName, email, phoneCountryCode, phoneNumber, attendance, accommodation, inviteFrom } =
+		body;
 
 	if (
 		!isNonEmptyString(firstName) ||
@@ -41,7 +62,8 @@ export async function POST(request: NextRequest) {
 		!isNonEmptyString(email) ||
 		!isNonEmptyString(phoneNumber) ||
 		(attendance !== "confirmed" && attendance !== "declined") ||
-		(accommodation !== "yes" && accommodation !== "no")
+		(accommodation !== "yes" && accommodation !== "no") ||
+		!isInviteFrom(inviteFrom)
 	) {
 		return NextResponse.json({ message: "Missing required RSVP fields." }, { status: 400 });
 	}
@@ -55,6 +77,7 @@ export async function POST(request: NextRequest) {
 		phoneNumber: phoneNumber.trim(),
 		attendance: attendance === "confirmed" ? "Yes" : "No",
 		accommodation: accommodation === "yes" ? "Yes" : "No",
+		inviteFrom,
 		event: "Oluwaseun & Oluwatimilehin",
 		source: "wedding/oluwaseun-oluwatimilehin",
 	};
