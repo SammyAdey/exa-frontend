@@ -98,11 +98,7 @@ export default function JustUs2WeddingRsvpPage() {
 			if (!response.ok) {
 				throw new Error(payload.message || "Unable to submit RSVP.");
 			}
-			setSuccessMessage(
-				attendance === "declined"
-					? "Thank you — we have noted that you cannot attend."
-					: "Thank you — your RSVP has been received.",
-			);
+			setSuccessMessage(attendance === "declined" ? "Thank you — we have noted that you cannot attend." : "Thank you — your RSVP has been received.");
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Unable to submit RSVP.");
 		} finally {
@@ -115,7 +111,7 @@ export default function JustUs2WeddingRsvpPage() {
 
 	return (
 		<div
-			className="min-h-screen"
+			className='min-h-screen'
 			style={{
 				...styles.pageText,
 				fontFamily: "var(--font-wedding-body), system-ui, sans-serif",
@@ -123,7 +119,7 @@ export default function JustUs2WeddingRsvpPage() {
 			}}
 		>
 			<div
-				className="pointer-events-none fixed inset-0 opacity-40"
+				className='pointer-events-none fixed inset-0 opacity-40'
 				style={{
 					backgroundImage:
 						"radial-gradient(circle at 12% 88%, rgba(196, 160, 176, 0.28), transparent 34%), radial-gradient(circle at 88% 90%, rgba(176, 150, 184, 0.22), transparent 32%)",
@@ -131,16 +127,13 @@ export default function JustUs2WeddingRsvpPage() {
 				aria-hidden
 			/>
 
-			<main className="relative z-10 mx-auto w-full max-w-2xl px-5 pb-20 pt-8 sm:px-8">
-				<header className="text-center">
-					<p
-						className="text-[11px] uppercase tracking-[0.35em]"
-						style={{ ...styles.muted, fontFamily: "var(--font-wedding-body)" }}
-					>
+			<main className='relative z-10 mx-auto w-full max-w-2xl px-5 pb-20 pt-8 sm:px-8'>
+				<header className='text-center'>
+					<p className='text-[11px] tracking-[0.35em]' style={{ ...styles.muted, fontFamily: "var(--font-wedding-body)" }}>
 						{"#juSTus2"}
 					</p>
 					<div
-						className="relative mx-auto mt-5 w-full max-w-md overflow-hidden rounded-sm"
+						className='relative mx-auto mt-5 w-full max-w-md overflow-hidden rounded-sm'
 						style={{
 							aspectRatio: "3 / 4",
 							boxShadow: "0 24px 60px rgba(40,28,24,0.18)",
@@ -148,15 +141,15 @@ export default function JustUs2WeddingRsvpPage() {
 					>
 						<Image
 							src={INVITE_IMAGE}
-							alt="Wedding invitation for Oluwaseun and Oluwatimilehin"
+							alt='Wedding invitation for Oluwaseun and Oluwatimilehin'
 							fill
 							priority
-							sizes="(max-width: 768px) 100vw, 448px"
-							className="object-cover object-top"
+							sizes='(max-width: 768px) 100vw, 448px'
+							className='object-cover object-top'
 						/>
 					</div>
 					<h1
-						className="mt-8 text-4xl leading-tight tracking-wide sm:text-5xl"
+						className='mt-8 text-4xl leading-tight tracking-wide sm:text-5xl'
 						style={{
 							...styles.pageText,
 							fontFamily: "var(--font-wedding-display), Georgia, serif",
@@ -164,30 +157,30 @@ export default function JustUs2WeddingRsvpPage() {
 						}}
 					>
 						Oluwaseun
-						<span className="mx-2 inline-block text-2xl sm:text-3xl" style={styles.blush}>
+						<span className='mx-2 inline-block text-2xl sm:text-3xl' style={styles.blush}>
 							&
 						</span>
 						Oluwatimilehin
 					</h1>
-					<p className="mt-3 text-sm tracking-wide" style={styles.soft}>
+					<p className='mt-3 text-sm tracking-wide' style={styles.soft}>
 						Tuesday, 22 December 2026 · Victoria Island, Lagos
 					</p>
-					<div className="mx-auto mt-5 h-px w-24" style={styles.rule} />
-					<p className="mt-5 text-sm leading-relaxed" style={styles.body}>
-						The families of Mr. Olanrewaju &amp; Mrs. Eunice Oloruntoba and Mr. Olugbenga &amp; Mrs.
-						Aderemi Ademulegun cordially invite you to celebrate with them.
+					<div className='mx-auto mt-5 h-px w-24' style={styles.rule} />
+					<p className='mt-5 text-sm leading-relaxed' style={styles.body}>
+						The families of Mr. Olanrewaju &amp; Mrs. Eunice Oloruntoba and Mr. Olugbenga &amp; Mrs. Aderemi Ademulegun cordially invite you to
+						celebrate with them.
 					</p>
 				</header>
 
 				<section
-					className="mt-10 rounded-2xl border p-6 backdrop-blur-sm sm:p-8"
+					className='mt-10 rounded-2xl border p-6 backdrop-blur-sm sm:p-8'
 					style={{
 						...styles.card,
 						boxShadow: "0 12px 40px rgba(40,28,24,0.06)",
 					}}
 				>
 					<h2
-						className="text-center text-3xl"
+						className='text-center text-3xl'
 						style={{
 							...styles.pageText,
 							fontFamily: "var(--font-wedding-display), Georgia, serif",
@@ -196,57 +189,57 @@ export default function JustUs2WeddingRsvpPage() {
 					>
 						Kindly Respond
 					</h2>
-					<p className="mt-2 text-center text-sm" style={styles.muted}>
+					<p className='mt-2 text-center text-sm' style={styles.muted}>
 						Confirm or decline your attendance.
 					</p>
 
 					{error && (
 						<div
-							id="wedding-rsvp-alert"
-							role="alert"
-							className="mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-900"
+							id='wedding-rsvp-alert'
+							role='alert'
+							className='mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-900'
 						>
-							<AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" aria-hidden />
+							<AlertCircle className='mt-0.5 h-5 w-5 shrink-0 text-red-500' aria-hidden />
 							<div>
-								<p className="text-sm font-semibold">Unable to submit RSVP</p>
-								<p className="mt-1 text-sm">{error}</p>
+								<p className='text-sm font-semibold'>Unable to submit RSVP</p>
+								<p className='mt-1 text-sm'>{error}</p>
 							</div>
 						</div>
 					)}
 
 					{successMessage && (
 						<div
-							id="wedding-rsvp-alert"
-							role="status"
-							className="mt-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-950"
+							id='wedding-rsvp-alert'
+							role='status'
+							className='mt-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-950'
 						>
-							<CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden />
+							<CheckCircle2 className='mt-0.5 h-5 w-5 shrink-0 text-emerald-600' aria-hidden />
 							<div>
-								<p className="text-sm font-semibold">RSVP received</p>
-								<p className="mt-1 text-sm">{successMessage}</p>
+								<p className='text-sm font-semibold'>RSVP received</p>
+								<p className='mt-1 text-sm'>{successMessage}</p>
 							</div>
 						</div>
 					)}
 
 					{!successMessage && (
 						<form
-							className="mt-6 space-y-4"
+							className='mt-6 space-y-4'
 							onSubmit={(event) => {
 								event.preventDefault();
 							}}
 						>
-							<div className="grid gap-4 sm:grid-cols-2">
+							<div className='grid gap-4 sm:grid-cols-2'>
 								<input
-									type="text"
-									placeholder="First name"
+									type='text'
+									placeholder='First name'
 									value={firstName}
 									onChange={(e) => setFirstName(e.target.value)}
 									className={inputClass}
 									style={styles.input}
 								/>
 								<input
-									type="text"
-									placeholder="Last name"
+									type='text'
+									placeholder='Last name'
 									value={lastName}
 									onChange={(e) => setLastName(e.target.value)}
 									className={inputClass}
@@ -254,22 +247,17 @@ export default function JustUs2WeddingRsvpPage() {
 								/>
 							</div>
 							<input
-								type="email"
-								placeholder="Email address"
+								type='email'
+								placeholder='Email address'
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								className={inputClass}
 								style={styles.input}
 							/>
-							<div className="grid gap-3 sm:grid-cols-3">
-								<label className="flex flex-col gap-2 text-sm" style={styles.soft}>
+							<div className='grid gap-3 sm:grid-cols-3'>
+								<label className='flex flex-col gap-2 text-sm' style={styles.soft}>
 									Country code
-									<select
-										value={countryCode}
-										onChange={(e) => setCountryCode(e.target.value)}
-										className={inputClass}
-										style={styles.input}
-									>
+									<select value={countryCode} onChange={(e) => setCountryCode(e.target.value)} className={inputClass} style={styles.input}>
 										{COUNTRY_CODES.map((code) => (
 											<option key={code.name} value={code.value}>
 												{code.label}
@@ -277,11 +265,11 @@ export default function JustUs2WeddingRsvpPage() {
 										))}
 									</select>
 								</label>
-								<label className="flex flex-col gap-2 text-sm sm:col-span-2" style={styles.soft}>
+								<label className='flex flex-col gap-2 text-sm sm:col-span-2' style={styles.soft}>
 									Phone number
 									<input
-										type="tel"
-										placeholder="Phone number"
+										type='tel'
+										placeholder='Phone number'
 										value={phoneNumber}
 										onChange={(e) => setPhoneNumber(e.target.value)}
 										className={inputClass}
@@ -290,16 +278,10 @@ export default function JustUs2WeddingRsvpPage() {
 								</label>
 							</div>
 
-							<label className="flex flex-col gap-2 text-sm" style={styles.soft}>
+							<label className='flex flex-col gap-2 text-sm' style={styles.soft}>
 								Who did you receive the invite from?
-								<select
-									value={inviteFrom}
-									onChange={(e) => setInviteFrom(e.target.value)}
-									className={inputClass}
-									style={styles.input}
-									required
-								>
-									<option value="" disabled>
+								<select value={inviteFrom} onChange={(e) => setInviteFrom(e.target.value)} className={inputClass} style={styles.input} required>
+									<option value='' disabled>
 										Select a name
 									</option>
 									{INVITE_FROM_OPTIONS.map((name) => (
@@ -310,49 +292,37 @@ export default function JustUs2WeddingRsvpPage() {
 								</select>
 							</label>
 
-							<fieldset className="rounded-xl border bg-white px-4 py-4" style={{ borderColor: "#ddd0ca" }}>
-								<legend className="px-1 text-sm font-medium" style={styles.body}>
+							<fieldset className='rounded-xl border bg-white px-4 py-4' style={{ borderColor: "#ddd0ca" }}>
+								<legend className='px-1 text-sm font-medium' style={styles.body}>
 									Do you require accommodation in Lagos?
 								</legend>
-								<div className="mt-2 flex flex-wrap gap-4">
-									<label className="flex items-center gap-2 text-sm" style={styles.pageText}>
-										<input
-											type="radio"
-											name="accommodation"
-											value="yes"
-											checked={accommodation === "yes"}
-											onChange={() => setAccommodation("yes")}
-										/>
+								<div className='mt-2 flex flex-wrap gap-4'>
+									<label className='flex items-center gap-2 text-sm' style={styles.pageText}>
+										<input type='radio' name='accommodation' value='yes' checked={accommodation === "yes"} onChange={() => setAccommodation("yes")} />
 										Yes
 									</label>
-									<label className="flex items-center gap-2 text-sm" style={styles.pageText}>
-										<input
-											type="radio"
-											name="accommodation"
-											value="no"
-											checked={accommodation === "no"}
-											onChange={() => setAccommodation("no")}
-										/>
+									<label className='flex items-center gap-2 text-sm' style={styles.pageText}>
+										<input type='radio' name='accommodation' value='no' checked={accommodation === "no"} onChange={() => setAccommodation("no")} />
 										No
 									</label>
 								</div>
 							</fieldset>
 
-							<div className="mt-2 flex flex-col gap-3 sm:flex-row">
+							<div className='mt-2 flex flex-col gap-3 sm:flex-row'>
 								<button
-									type="button"
+									type='button'
 									disabled={submitting}
 									onClick={() => handleSubmit("confirmed")}
-									className="flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+									className='flex-1 rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60'
 									style={styles.primaryBtn}
 								>
 									{submitting ? "Submitting..." : "I'm Attending"}
 								</button>
 								<button
-									type="button"
+									type='button'
 									disabled={submitting}
 									onClick={() => handleSubmit("declined")}
-									className="flex-1 rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
+									className='flex-1 rounded-xl border px-4 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60'
 									style={{ borderColor: "#c9b4bc", color: "#5c4f4b" }}
 								>
 									{submitting ? "Submitting..." : "I can't attend"}
@@ -362,7 +332,7 @@ export default function JustUs2WeddingRsvpPage() {
 					)}
 				</section>
 
-				<p className="mt-10 text-center text-[11px] uppercase tracking-[0.3em]" style={{ color: "#9a8b86" }}>
+				<p className='mt-10 text-center text-[11px] tracking-[0.3em]' style={{ color: "#9a8b86" }}>
 					{"#juSTus2"}
 				</p>
 			</main>
