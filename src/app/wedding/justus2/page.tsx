@@ -98,7 +98,11 @@ export default function JustUs2WeddingRsvpPage() {
 			if (!response.ok) {
 				throw new Error(payload.message || "Unable to submit RSVP.");
 			}
-			setSuccessMessage(attendance === "declined" ? "Thank you — we have noted that you cannot attend." : "Thank you — your RSVP has been received.");
+			setSuccessMessage(
+				attendance === "declined"
+					? "Thank you — we have noted that you cannot attend."
+					: "Thank you - your RSVP has been received. We will reach out to you closer to the event date.",
+			);
 		} catch (err) {
 			setError(err instanceof Error ? err.message : "Unable to submit RSVP.");
 		} finally {
