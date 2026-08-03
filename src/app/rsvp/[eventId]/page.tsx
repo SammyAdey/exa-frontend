@@ -17,7 +17,7 @@ type EventPayload = {
 	eventAddress?: string;
 	eventImage?: string;
 	dressCode?: string;
-	description?: string;
+	eventDescription?: string;
 };
 
 type RSVPStatus = "confirmed" | "declined";
@@ -140,7 +140,7 @@ export default function RSVPPage() {
 						eventImage: event.eventImage || "",
 						eventLocation: event.eventAddress || "TBD",
 						dressCode: event.dressCode || "-",
-						description: event.description || "-",
+						description: event.eventDescription || "-",
 					},
 					email,
 					phoneNumber: `${countryCode}${phoneNumber.replace(/\D/g, "").replace(/^0+/, "")}`,
@@ -165,6 +165,8 @@ export default function RSVPPage() {
 		}
 	};
 
+	const eventDescription = event?.eventDescription?.trim();
+
 	return (
 		<div className='min-h-screen text-white transition-[background-color] duration-700' style={{ backgroundColor: pageTheme.background }}>
 			<div className='relative min-h-screen overflow-hidden'>
@@ -183,14 +185,16 @@ export default function RSVPPage() {
 
 				<main className='relative z-10 mx-auto w-full max-w-3xl gap-10 px-6 pb-20 pt-8 lg:flex-row lg:items-start lg:gap-16'>
 					<div className='flex-1 space-y-6'>
-						<div className=' space-y-4'>
+						<div className='space-y-4'>
 							{event?.eventImage && (
-								<div className='relative min-h-56 md:min-h-108 w-full overflow-hidden rounded-2xl'>
-									<Image src={event.eventImage} alt={eventTitle} fill className='object-cover' />
+								<div className='w-full overflow-hidden rounded-2xl'>
+									{/* Native img keeps the uploaded image's intrinsic height */}
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img src={event.eventImage} alt={eventTitle} className='h-auto w-full' />
 								</div>
 							)}
 							<h1 className='text-4xl font-semibold leading-tight md:text-5xl'>{eventTitle}</h1>
-							<p>{event?.description}</p>
+							{eventDescription ? <p className='text-base leading-relaxed text-white/75 md:text-lg'>{eventDescription}</p> : null}
 						</div>
 					</div>
 
