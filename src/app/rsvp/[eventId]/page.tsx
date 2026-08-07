@@ -23,6 +23,22 @@ type EventPayload = {
 
 type RSVPStatus = "confirmed" | "declined";
 
+type HouseholdMember = {
+	guestlistId: string;
+	firstname: string;
+	lastname: string;
+	email: string;
+	status: "confirmed" | "declined" | null;
+};
+
+type HouseholdPayload = {
+	householdId: string;
+	phoneNumber: string;
+	rsvpMode: "joint" | "independent";
+	displayName: string;
+	members: HouseholdMember[];
+};
+
 export default function RSVPPage() {
 	const { eventId: eventIdParam } = useParams();
 	const eventId = normalizeRouteParam(eventIdParam);
@@ -37,6 +53,9 @@ export default function RSVPPage() {
 	const [submitting, setSubmitting] = useState(false);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [extractedTheme, setExtractedTheme] = useState<{ image: string; theme: EventPageTheme } | null>(null);
+	const [household, setHousehold] = useState<HouseholdPayload | null>(null);
+	const [memberChoices, setMemberChoices] = useState<Record<string, RSVPStatus | "">>({});
+	const [lookingUpHousehold, setLookingUpHousehold] = useState(false);
 
 	useEffect(() => {
 		if (!error && !successMessage) {
@@ -111,9 +130,55 @@ export default function RSVPPage() {
 		};
 	}, [eventImage]);
 
+	const e164Phone = useMemo(() => {
+		const national = phoneNumber.replace(/\D/g, "").replace(/^0+/, "");
+		if (!national) return "";
+		return `${countryCode}${national}`;
+	}, [countryCode, phoneNumber]);
+
+	const lookupHousehold = async () => {
+		if (!e164Phone || !eventId) {
+			setHousehold(null);
+			return;
+		}
+		try {
+			setLookingUpHousehold(true);
+			const response = await fetch(
+				withQuery(process.env.NEXT_PUBLIC_API_BASE_URL ?? "", "/rsvp/households/by-event", {
+					eventId: String(eventId),
+					phone: e164Phone,
+				}),
+				{ cache: "no-store" },
+			);
+			const payload = await response.json().catch(() => ({}));
+			if (!response.ok || !payload?.data?.members?.length) {
+				setHousehold(null);
+				setMemberChoices({});
+				return;
+			}
+			const data = payload.data as HouseholdPayload;
+			setHousehold(data);
+			const choices: Record<string, RSVPStatus | ""> = {};
+			for (const member of data.members) {
+				choices[member.guestlistId] = member.status || "";
+			}
+			setMemberChoices(choices);
+			if (data.members.length === 1) {
+				const only = data.members[0];
+				if (!firstName && only.firstname) setFirstName(only.firstname);
+				if (!lastName && only.lastname) setLastName(only.lastname);
+				if (!email && only.email) setEmail(only.email);
+			}
+		} catch {
+			setHousehold(null);
+		} finally {
+			setLookingUpHousehold(false);
+		}
+	};
+
 	const handleSubmit = async (status: RSVPStatus) => {
-		if (!email || !firstName || !lastName || !phoneNumber) {
-			setError("Please fill in your first name, last name, email, and phone number.");
+		if (!e164Phone) {
+			setError("Please enter your phone number.");
 			return;
 		}
 		if (!event) {
@@ -124,6 +189,45 @@ export default function RSVPPage() {
 		setSuccessMessage(null);
 		setSubmitting(true);
 		try {
+			if (household && household.members.length > 1) {
+				const responses =
+					household.rsvpMode === "joint"
+						? [{ guestlistId: household.members[0].guestlistId, status }]
+						: household.members
+								.map((member) => ({
+									guestlistId: member.guestlistId,
+									status: (memberChoices[member.guestlistId] || status) as RSVPStatus,
+								}))
+								.filter((row) => row.status === "confirmed" || row.status === "declined");
+
+				if (household.rsvpMode === "independent" && responses.length === 0) {
+					throw new Error("Choose confirm or decline for each guest.");
+				}
+
+				const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rsvp/households/rsvp`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						eventId: event.eventId || String(eventId),
+						phoneNumber: e164Phone,
+						responses,
+						responderEmail: email || undefined,
+					}),
+				});
+				const payload: { message?: string } = await response.json().catch(() => ({}));
+				if (!response.ok) {
+					throw new Error(payload?.message || "Unable to submit household RSVP.");
+				}
+				setSuccessMessage("Your household RSVP has been recorded.");
+				await lookupHousehold();
+				return;
+			}
+
+			if (!email || !firstName || !lastName) {
+				setError("Please fill in your first name, last name, email, and phone number.");
+				return;
+			}
+
 			const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rsvp/rsvps/create`, {
 				method: "POST",
 				headers: {
@@ -141,7 +245,7 @@ export default function RSVPPage() {
 						description: event.eventDescription || "-",
 					},
 					email,
-					phoneNumber: `${countryCode}${phoneNumber.replace(/\D/g, "").replace(/^0+/, "")}`,
+					phoneNumber: e164Phone,
 					phoneCountryCode: countryCode,
 					firstname: firstName,
 					lastname: lastName,
@@ -288,10 +392,52 @@ export default function RSVPPage() {
 											placeholder='Phone number'
 											value={phoneNumber}
 											onChange={(event) => setPhoneNumber(event.target.value)}
+											onBlur={() => void lookupHousehold()}
 											className='w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-primary/60 focus:outline-none'
 										/>
 									</label>
 								</div>
+								{lookingUpHousehold ? (
+									<p className='text-xs text-white/50'>Checking guest list for this number…</p>
+								) : null}
+								{household && household.members.length > 1 ? (
+									<div className='rounded-2xl border border-white/10 bg-white/5 p-4'>
+										<p className='text-sm font-medium text-white'>{household.displayName}</p>
+										<p className='mt-1 text-xs text-white/55'>
+											{household.rsvpMode === "joint"
+												? "Shared household — one response confirms or declines everyone."
+												: "Shared number — set each guest to confirm or decline."}
+										</p>
+										<ul className='mt-3 space-y-2'>
+											{household.members.map((member) => (
+												<li key={member.guestlistId} className='flex flex-wrap items-center justify-between gap-2 text-sm'>
+													<span>
+														{member.firstname} {member.lastname}
+														{member.status ? (
+															<span className='ml-2 text-xs uppercase text-white/45'>{member.status}</span>
+														) : null}
+													</span>
+													{household.rsvpMode === "independent" ? (
+														<select
+															value={memberChoices[member.guestlistId] || ""}
+															onChange={(e) =>
+																setMemberChoices((prev) => ({
+																	...prev,
+																	[member.guestlistId]: e.target.value as RSVPStatus | "",
+																}))
+															}
+															className='rounded-lg border border-white/10 bg-black/40 px-2 py-1 text-xs text-white'
+														>
+															<option value=''>Choose…</option>
+															<option value='confirmed'>Confirm</option>
+															<option value='declined'>Decline</option>
+														</select>
+													) : null}
+												</li>
+											))}
+										</ul>
+									</div>
+								) : null}
 								<div className='mt-6 flex flex-col gap-3 sm:flex-row'>
 									<button
 										type='button'
