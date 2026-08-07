@@ -7,6 +7,7 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 import RsvpEventDetails from "../../../components/rsvp-event-details";
 import { DEFAULT_EVENT_PAGE_THEME, extractImageAccentColor, type EventPageTheme } from "../../../utils/image-accent-color";
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from "../../../utils/country-codes";
+import { formatEventCalendarDate } from "../../../utils/event-date";
 import { normalizeRouteParam, withQuery } from "../../../utils/url";
 
 type EventPayload = {
@@ -50,15 +51,12 @@ export default function RSVPPage() {
 	const eventStartDate = event?.eventStartDate;
 	const formattedDate = useMemo(() => {
 		if (!eventStartDate) return "";
-		const date = new Date(eventStartDate);
-		return Number.isNaN(date.getTime())
-			? ""
-			: date.toLocaleDateString("en-US", {
-					weekday: "long",
-					year: "numeric",
-					month: "long",
-					day: "numeric",
-				});
+		return formatEventCalendarDate(eventStartDate, "en-US", {
+			weekday: "long",
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
 	}, [eventStartDate]);
 	const pageTheme =
 		eventImage && extractedTheme?.image === eventImage ? extractedTheme.theme : DEFAULT_EVENT_PAGE_THEME;
