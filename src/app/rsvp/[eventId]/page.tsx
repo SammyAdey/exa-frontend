@@ -54,7 +54,7 @@ export default function RSVPPage() {
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 	const [extractedTheme, setExtractedTheme] = useState<{ image: string; theme: EventPageTheme } | null>(null);
 	const [household, setHousehold] = useState<HouseholdPayload | null>(null);
-	const [memberChoices, setMemberChoices] = useState<Record<string, RSVPStatus | "">>({});
+	const [attendingIds, setAttendingIds] = useState<Set<string>>(new Set());
 	const [lookingUpHousehold, setLookingUpHousehold] = useState(false);
 
 	useEffect(() => {
@@ -153,27 +153,41 @@ export default function RSVPPage() {
 			const payload = await response.json().catch(() => ({}));
 			if (!response.ok || !payload?.data?.members?.length) {
 				setHousehold(null);
-				setMemberChoices({});
+				setAttendingIds(new Set());
 				return;
 			}
 			const data = payload.data as HouseholdPayload;
 			setHousehold(data);
-			const choices: Record<string, RSVPStatus | ""> = {};
+			const nextAttending = new Set<string>();
 			for (const member of data.members) {
-				choices[member.guestlistId] = member.status || "";
+				if (member.status === "declined") continue;
+				nextAttending.add(member.guestlistId);
 			}
-			setMemberChoices(choices);
+			setAttendingIds(nextAttending);
 			if (data.members.length === 1) {
 				const only = data.members[0];
 				if (!firstName && only.firstname) setFirstName(only.firstname);
 				if (!lastName && only.lastname) setLastName(only.lastname);
 				if (!email && only.email) setEmail(only.email);
+			} else {
+				const withEmail = data.members.find((m) => m.email?.trim());
+				if (!email && withEmail?.email) setEmail(withEmail.email);
 			}
 		} catch {
 			setHousehold(null);
+			setAttendingIds(new Set());
 		} finally {
 			setLookingUpHousehold(false);
 		}
+	};
+
+	const toggleAttending = (guestlistId: string) => {
+		setAttendingIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(guestlistId)) next.delete(guestlistId);
+			else next.add(guestlistId);
+			return next;
+		});
 	};
 
 	const handleSubmit = async (status: RSVPStatus) => {
@@ -185,24 +199,26 @@ export default function RSVPPage() {
 			setError("Event details are missing.");
 			return;
 		}
+		const trimmedEmail = email.trim();
+		if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+			setError("Please enter a valid email address.");
+			return;
+		}
 		setError(null);
 		setSuccessMessage(null);
 		setSubmitting(true);
 		try {
 			if (household && household.members.length > 1) {
 				const responses =
-					household.rsvpMode === "joint"
-						? [{ guestlistId: household.members[0].guestlistId, status }]
-						: household.members
-								.map((member) => ({
-									guestlistId: member.guestlistId,
-									status: (memberChoices[member.guestlistId] || status) as RSVPStatus,
-								}))
-								.filter((row) => row.status === "confirmed" || row.status === "declined");
-
-				if (household.rsvpMode === "independent" && responses.length === 0) {
-					throw new Error("Choose confirm or decline for each guest.");
-				}
+					status === "declined"
+						? household.members.map((member) => ({
+								guestlistId: member.guestlistId,
+								status: "declined" as const,
+							}))
+						: household.members.map((member) => ({
+								guestlistId: member.guestlistId,
+								status: (attendingIds.has(member.guestlistId) ? "confirmed" : "declined") as RSVPStatus,
+							}));
 
 				const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/rsvp/households/rsvp`, {
 					method: "POST",
@@ -211,7 +227,7 @@ export default function RSVPPage() {
 						eventId: event.eventId || String(eventId),
 						phoneNumber: e164Phone,
 						responses,
-						responderEmail: email || undefined,
+						responderEmail: trimmedEmail,
 					}),
 				});
 				const payload: { message?: string } = await response.json().catch(() => ({}));
@@ -223,7 +239,7 @@ export default function RSVPPage() {
 				return;
 			}
 
-			if (!email || !firstName || !lastName) {
+			if (!firstName || !lastName) {
 				setError("Please fill in your first name, last name, email, and phone number.");
 				return;
 			}
@@ -244,7 +260,7 @@ export default function RSVPPage() {
 						dressCode: event.dressCode || "-",
 						description: event.eventDescription || "-",
 					},
-					email,
+					email: trimmedEmail,
 					phoneNumber: e164Phone,
 					phoneCountryCode: countryCode,
 					firstname: firstName,
@@ -365,8 +381,9 @@ export default function RSVPPage() {
 								</div>
 								<input
 									type='email'
-									placeholder='Email address'
+									placeholder='Email address (required)'
 									value={email}
+									required
 									onChange={(event) => setEmail(event.target.value)}
 									className='w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-primary/60 focus:outline-none'
 								/>
@@ -404,35 +421,26 @@ export default function RSVPPage() {
 									<div className='rounded-2xl border border-white/10 bg-white/5 p-4'>
 										<p className='text-sm font-medium text-white'>{household.displayName}</p>
 										<p className='mt-1 text-xs text-white/55'>
-											{household.rsvpMode === "joint"
-												? "Shared household — one response confirms or declines everyone."
-												: "Shared number — set each guest to confirm or decline."}
+											Select who is attending. Unchecked guests will be marked as not attending.
 										</p>
 										<ul className='mt-3 space-y-2'>
 											{household.members.map((member) => (
 												<li key={member.guestlistId} className='flex flex-wrap items-center justify-between gap-2 text-sm'>
-													<span>
-														{member.firstname} {member.lastname}
-														{member.status ? (
-															<span className='ml-2 text-xs uppercase text-white/45'>{member.status}</span>
-														) : null}
-													</span>
-													{household.rsvpMode === "independent" ? (
-														<select
-															value={memberChoices[member.guestlistId] || ""}
-															onChange={(e) =>
-																setMemberChoices((prev) => ({
-																	...prev,
-																	[member.guestlistId]: e.target.value as RSVPStatus | "",
-																}))
-															}
-															className='rounded-lg border border-white/10 bg-black/40 px-2 py-1 text-xs text-white'
-														>
-															<option value=''>Choose…</option>
-															<option value='confirmed'>Confirm</option>
-															<option value='declined'>Decline</option>
-														</select>
-													) : null}
+													<label className='flex min-w-0 flex-1 cursor-pointer items-center gap-3'>
+														<input
+															type='checkbox'
+															checked={attendingIds.has(member.guestlistId)}
+															onChange={() => toggleAttending(member.guestlistId)}
+															className='h-4 w-4 rounded border-white/20 bg-black/40'
+															aria-label={`Attending: ${member.firstname} ${member.lastname}`}
+														/>
+														<span>
+															{member.firstname} {member.lastname}
+															{member.status ? (
+																<span className='ml-2 text-xs uppercase text-white/45'>{member.status}</span>
+															) : null}
+														</span>
+													</label>
 												</li>
 											))}
 										</ul>
@@ -445,7 +453,10 @@ export default function RSVPPage() {
 										onClick={() => handleSubmit("confirmed")}
 										className='flex-1 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-black transition hover:cursor-pointer hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
 									>
-										{submitingLabel(submitting, "I'm Attending")}
+										{submitingLabel(
+											submitting,
+											household && household.members.length > 1 ? "Submit RSVP" : "I'm Attending",
+										)}
 									</button>
 									<button
 										type='button'
@@ -453,7 +464,10 @@ export default function RSVPPage() {
 										onClick={() => handleSubmit("declined")}
 										className='flex-1 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold hover:cursor-pointer text-white/80 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60'
 									>
-										{submitingLabel(submitting, "I can't attend")}
+										{submitingLabel(
+											submitting,
+											household && household.members.length > 1 ? "Nobody can attend" : "I can't attend",
+										)}
 									</button>
 								</div>
 							</form>
